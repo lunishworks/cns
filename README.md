@@ -1,9 +1,8 @@
 # Setup
 
 ```
-```
+
 docker build -t cns-home .
-```
 ```
 
 
