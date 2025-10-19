@@ -1,6 +1,17 @@
 {
+  "name": "cns-studios",
+  "version": "1.0.0",
   "dependencies": {
+    "bcrypt": "^6.0.0",
+    "better-sqlite3": "^12.4.1",
+    "cookie-parser": "^1.4.7",
+    "dotenv": "^17.2.3",
     "express": "^5.1.0",
-    "path": "^0.12.7"
+    "express-validator": "^7.2.1",
+    "jsonwebtoken": "^9.0.2"
+  },
+  "scripts": {
+    "start": "node server.js",
+    "dev": "nodemon server.js"
   }
 }
