@@ -7,7 +7,6 @@ async function checkAuthStatus() {
         
         if (data.authenticated) {
             loginBtn.textContent = data.username.toUpperCase();
-            loginBtn.style.background = '#FAA307';
             loginBtn.style.cursor = 'default';
             
             loginBtn.onclick = async () => {
