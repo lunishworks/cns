@@ -1,4 +1,5 @@
 @import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Jersey+25&display=swap');
 
 * {
     margin: 0;
@@ -158,13 +159,19 @@ nav a:hover {
 }
 
 .subsection-title {
-    font-size: 16px;
+    font-family: "Jersey 25", sans-serif;
+    font-weight: 300;
+    font-style: normal;
+    font-size: 30px;
     color: #F48C06;
     margin: 30px 0 15px 0;
 }
 
 .doc-text {
-    font-size: 10px;
+    font-family: "Jersey 25", sans-serif;
+    font-weight: 400;
+    font-style: normal;
+    font-size: 22px;
     line-height: 2;
     color: #FAA307;
     margin-bottom: 20px;
@@ -260,6 +267,10 @@ nav a:hover {
 }
 
 .code-block {
+    font-family: "Jersey 25", sans-serif;
+    font-weight: 400;
+    font-style: normal;
+    font-size: 20px;
     background: #03071E;
     border: 3px solid #6A040F;
     padding: 20px;
