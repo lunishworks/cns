@@ -10,8 +10,10 @@ COPY package*.json ./
 # Install dependencies
 RUN npm install
 
-# Copy the rest of the application (static files)
-COPY . .
+COPY public/ ./public/
+COPY server.js .
+COPY database.js .
+
 
 # Expose the port the app runs on (e.g., 3000)
 EXPOSE 8080

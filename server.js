@@ -228,7 +228,7 @@ app.get('/github', (req, res) => {
 });
 
 app.use((req, res) => {
-    res.status(404).send('File not found');
+    res.status(404).send('Adress not found');
 });
 
 app.listen(port, () => {
