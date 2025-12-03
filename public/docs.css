@@ -220,6 +220,15 @@ nav a:hover {
     font-size: 11px;
     color: #FFBA08;
     margin-bottom: 15px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.warning-box .icon {
+    width: 20px;
+    height: 20px;
+    fill: #FFBA08;
 }
 
 .info-box ul,
