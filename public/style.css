@@ -356,6 +356,11 @@ nav a:hover {
     box-shadow: 0 5px 0 #9D0208;
 }
 
+.card-link {
+    text-decoration: none;
+    color: inherit; /* Ensure text color is inherited from the card, not the link default */
+}
+
 footer {
     background: #03071E;
     border-top: 4px solid #6A040F;
