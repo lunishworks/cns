@@ -3,7 +3,6 @@ const express = require('express');
 const path = require('path');
 const cookieParser = require('cookie-parser');
 const http = require('http'); // Using the native http module
-const { initDatabase } = require('./database');
 
 const app = express();
 const port = process.env.PORT || 3000;
@@ -11,7 +10,6 @@ const port = process.env.PORT || 3000;
 // The URL for the central authentication service
 const AUTH_SERVICE_URL = process.env.AUTH_SERVICE_URL || 'http://localhost:3001';
 
-initDatabase();
 
 app.use(express.json());
 app.use(cookieParser());
@@ -68,20 +66,6 @@ app.get('/api/auth/status', (req, res) => {
 app.get('/', (req, res) => {
     res.sendFile(path.join(__dirname, 'public', 'index.html'));
 });
-
-// Example of a protected route that now relies on the frontend to redirect
-app.get('/dashboard', (req, res) => {
-    // In this new setup, the frontend will handle the redirect if not authenticated.
-    // If the user gets here, we assume the frontend has already verified auth.
-    // A more robust solution might still have server-side protection.
-    res.sendFile(path.join(__dirname, 'public', 'dashboard.html')); // Assuming you have a dashboard file
-});
-
-// These routes are no longer needed as the frontend will direct to the auth service
-// app.get('/login', ...);
-// app.get('/signup', ...);
-// app.get('/logout', ...);
-
 
 app.get('/docs', (req, res) => {
     res.sendFile(path.join(__dirname, 'public', 'docs.html'));
