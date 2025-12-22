@@ -78,6 +78,11 @@ document.querySelectorAll('.card, .small-card').forEach(card => {
                 e.preventDefault();
             }
         });
+
+        // Prevent the browser's default drag behavior on the link
+        cardLink.addEventListener('dragstart', function(e) {
+            e.preventDefault();
+        });
     }
 
     function dragStart(e) {
@@ -138,6 +143,8 @@ document.querySelectorAll('.card, .small-card').forEach(card => {
             xOffset = 0;
             yOffset = 0;
             isDragging = false;
+            // Reset hasDragged flag for the next interaction
+            hasDragged = false;
         }
     }
 });
