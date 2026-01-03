@@ -52,58 +52,153 @@ async function initializeApp() {
 
 initializeApp();
 
-// --- Draggable Card ---
-document.querySelectorAll('.card, .small-card').forEach(card => {
-    let isDragging = false;
-    let currentX;
-    let currentY;
-    let initialX;
-    let initialY;
-    let xOffset = 0;
-    let yOffset = 0;
-
-    card.addEventListener('mousedown', dragStart);
-    document.addEventListener('mousemove', drag);
-    document.addEventListener('mouseup', dragEnd);
-
-    function dragStart(e) {
-        initialX = e.clientX - xOffset;
-        initialY = e.clientY - yOffset;
+// --- Draggable Card Logic (refined for link-wrapped cards) ---
+(function() {
+    'use strict';
+    
+    const cardLinks = document.querySelectorAll('.card-link');
+    const DRAG_THRESHOLD = 5; // Pixels before considering it a drag
+    
+    cardLinks.forEach(cardLink => {
+        let hasMoved = false;
+        let isMouseDown = false;
+        let startX = 0;
+        let startY = 0;
+        let currentX = 0;
+        let currentY = 0;
+        let initialMouseX = 0;
+        let initialMouseY = 0;
         
-        if (e.target === card || card.contains(e.target)) {
-            isDragging = true;
-            card.classList.add('dragging');
-        }
-    }
-
-    function drag(e) {
-        if (isDragging) {
-            e.preventDefault();
-            currentX = e.clientX - initialX;
-            currentY = e.clientY - initialY;
-            xOffset = currentX;
-            yOffset = currentY;
+        let onMouseMove = null;
+        let onMouseUp = null;
+        
+        function handleMouseDown(e) {
+            // Only handle primary mouse button
+            if (e.button !== 0) return;
             
-            card.style.transform = `translate(${currentX}px, ${currentY}px)`;
+            // Prevent multiple simultaneous drags
+            if (isMouseDown) return;
+            
+            isMouseDown = true;
+            hasMoved = false;
+            startX = e.clientX;
+            startY = e.clientY;
+            initialMouseX = e.clientX;
+            initialMouseY = e.clientY;
+            
+            // Get current position from transform to prevent jump on drag start
+            try {
+                const transform = window.getComputedStyle(cardLink).transform;
+                if (transform && transform !== 'none') {
+                    const matrix = new DOMMatrix(transform);
+                    currentX = matrix.m41 || 0;
+                    currentY = matrix.m42 || 0;
+                } else {
+                    currentX = 0;
+                    currentY = 0;
+                }
+            } catch (err) {
+                currentX = 0;
+                currentY = 0;
+            }
+            
+            const cardElement = cardLink.querySelector('.card, .small-card');
+            if (cardElement) {
+                cardElement.classList.add('dragging');
+            }
+            
+            onMouseMove = function(e) {
+                e.preventDefault(); // Prevent text selection
+                
+                const deltaX = e.clientX - startX;
+                const deltaY = e.clientY - startY;
+                const totalDistance = Math.sqrt(deltaX * deltaX + deltaY * deltaY);
+                
+                // Only start dragging after threshold is exceeded
+                if (totalDistance > DRAG_THRESHOLD) {
+                    hasMoved = true;
+                    
+                    const newX = currentX + (e.clientX - initialMouseX);
+                    const newY = currentY + (e.clientY - initialMouseY);
+                    
+                    // Use GPU acceleration for smoother dragging
+                    cardLink.style.willChange = 'transform';
+                    cardLink.style.transform = `translate(${newX}px, ${newY}px)`;
+                }
+            };
+            
+            onMouseUp = function(e) {
+                cleanup();
+            };
+            
+            // Attach to document so drag works even if mouse leaves the card
+            document.addEventListener('mousemove', onMouseMove, { passive: false });
+            document.addEventListener('mouseup', onMouseUp);
+            
+            // Stop drag if user switches windows
+            window.addEventListener('blur', onMouseUp, { once: true });
         }
-    }
-
-    function dragEnd() {
-        if (isDragging) {
-            card.classList.remove('dragging');
-            card.style.transition = 'transform 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55)';
-            card.style.transform = 'translate(0, 0)';
+        
+        function cleanup() {
+            // Remove event listeners
+            if (onMouseMove) {
+                document.removeEventListener('mousemove', onMouseMove);
+            }
+            if (onMouseUp) {
+                document.removeEventListener('mouseup', onMouseUp);
+                window.removeEventListener('blur', onMouseUp);
+            }
+            
+            isMouseDown = false;
+            const cardElement = cardLink.querySelector('.card, .small-card');
+            if (cardElement) {
+                cardElement.classList.remove('dragging');
+            }
+            
+            // Reset willChange to save resources
+            cardLink.style.willChange = 'auto';
+            
+            onMouseMove = null;
+            onMouseUp = null;
+        }
+        
+        function handleClick(e) {
+            // Prevent link navigation if user was dragging
+            if (hasMoved) {
+                e.preventDefault();
+                e.stopPropagation();
+                e.stopImmediatePropagation();
+            }
+        }
+        
+        function handleDragStart(e) {
+            // Disable native browser drag and drop
+            e.preventDefault();
+        }
+        
+        function handleDoubleClick(e) {
+            e.preventDefault();
+            
+            // Animate card back to original position
+            cardLink.style.transition = 'transform 0.3s ease';
+            cardLink.style.transform = 'translate(0px, 0px)';
             
             setTimeout(() => {
-                card.style.transition = '';
-            }, 500);
+                cardLink.style.transition = '';
+            }, 300);
             
-            xOffset = 0;
-            yOffset = 0;
-            isDragging = false;
+            currentX = 0;
+            currentY = 0;
+            hasMoved = false;
         }
-    }
-});
+        
+        // Attach event listeners
+        cardLink.addEventListener('mousedown', handleMouseDown);
+        cardLink.addEventListener('click', handleClick, true); // Use capture phase
+        cardLink.addEventListener('dragstart', handleDragStart);
+        cardLink.addEventListener('dblclick', handleDoubleClick);
+    });
+})();
 
 // --- Button Hover Effect ---
 document.querySelectorAll('button, a').forEach(element => {
